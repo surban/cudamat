@@ -1,13 +1,17 @@
+Version 0.3
+- Fixed bug in max that showed up when an entire column was negative.
+- Fixed bug in activation computations in examples/rbm_numpy.py.
+
 Version 0.2
 - Methods add, subtract, mult, divide can now take scalars as well as instances of CUDAMatrix.
-- Deprecated add_by_scalar, mult_by_scalar, div_by_scalar.
-- Methods now return target or self.
+- Deprecated add_scalar, mult_by_scalar, div_by_scalar.
+- Methods now return target or self to make chaining operations easier.
 - Added asarray method.
 - Added transpose method.
 - Added sqrt and pow functions.
 - Added the sigmoid method to the module level.
 - Added add_row_vec.
-- Added empty. Now when you don't provide a target or a pre-allocated temporary storage cudamat methods will not take up CPU RAM or transfer anything between the CPU and GPU.
+- Added empty. Now when you don't provide a target or pre-allocated temporary storage cudamat methods will not take up CPU RAM or transfer anything between the CPU and GPU.
 - Added get_row_slice and set_row_slice.
 - Added less_than_scalar, greater_than, greater_than_scalar.
 - Added max (axis=1 is currently not supported.)

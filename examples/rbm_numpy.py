@@ -43,7 +43,7 @@ for epoch in range(num_epochs):
         wu_h *= momentum
 
         # positive phase
-        h = 1. / (1 + np.exp(-np.dot(w_vh.T, v) + w_h))
+        h = 1. / (1 + np.exp(-(np.dot(w_vh.T, v) + w_h)))
 
         wu_vh += np.dot(v, h.T)
         wu_v += v.sum(1)[:, np.newaxis]
@@ -53,8 +53,8 @@ for epoch in range(num_epochs):
         h = 1. * (h > np.random.rand(num_hid, batch_size))
 
         # negative phase
-        v = 1. / (1 + np.exp(-np.dot(w_vh, h) + w_v))
-        h = 1. / (1 + np.exp(-np.dot(w_vh.T, v) + w_h))
+        v = 1. / (1 + np.exp(-(np.dot(w_vh, h) + w_v)))
+        h = 1. / (1 + np.exp(-(np.dot(w_vh.T, v) + w_h)))
 
         wu_vh -= np.dot(v, h.T)
         wu_v -= v.sum(1)[:, np.newaxis]

@@ -93,3 +93,5 @@ for epoch in range(num_epochs):
 
 w_vh.copy_to_host()
 util.save('weights.dat', 'w_vh', {'w_vh': w_vh.numpy_array})
+
+cm.cublas_shutdown()

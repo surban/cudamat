@@ -160,8 +160,8 @@ def test_slice():
 
 
 def test_add_col_vec():
-    m = 256
-    n = 128
+    m = 250
+    n = 120
     a = np.array(np.random.rand(m, n)*10, dtype=np.float32, order='F')
     b = np.array(np.random.rand(m, 1)*10, dtype=np.float32, order='F')
     t = np.array(np.random.rand(m, n)*10, dtype=np.float32, order='F')
@@ -414,7 +414,27 @@ def test_greater_than():
 def test_max():
     m = 256
     n = 128
-    a = np.array(np.random.rand(m, n)*10, dtype=np.float32, order='F')
+    a = np.array(np.random.randn(m, n)*10, dtype=np.float32, order='F')
+    t = np.array(np.random.rand(1, n)*10, dtype=np.float32, order='F')
+   
+    r = np.atleast_2d(a.max(0)) 
+    
+    da = cm.CUDAMatrix(a)
+    dr1 = cm.CUDAMatrix(t)
+
+    da.max(axis = 0, target = dr1)
+    dr2 = da.max(axis = 0)
+
+    dr1.copy_to_host()
+    dr2.copy_to_host()
+
+    assert np.max(np.abs(r - dr1.numpy_array)) < 10**-4, "Error in CUDAMatrix.max exceeded threshold"
+    assert np.max(np.abs(r - dr2.numpy_array)) < 10**-4, "Error in CUDAMatrix.max exceeded threshold"
+
+def test_max2():
+    m = 256
+    n = 128
+    a = np.array(-np.random.rand(m, n)*10, dtype=np.float32, order='F')
     t = np.array(np.random.rand(1, n)*10, dtype=np.float32, order='F')
    
     r = np.atleast_2d(a.max(0)) 

@@ -82,6 +82,7 @@ __global__ void kSetRowSlice(float* source, float* target, int start, int end, i
     if (row < end) {
         for (int cur_col = start_col; cur_col < end_col; cur_col++)
             target[cur_col * height + row] = source[cur_col * source_height + row - start];
+            //source[cur_col * height + row - start] = target[cur_col * target_height + row];
     }
 }
 
@@ -151,7 +152,7 @@ __global__ void kGreaterThanScalar(float* mat, float val, float* target, unsigne
 
 __global__ void kMaxColumnwise(float* mat, float* target, unsigned int width, unsigned int height) {
     __shared__ float max_vals[32];
-    float cur_max = FLT_MIN;
+    float cur_max = -FLT_MAX;
     float val = 0;
  
     for (unsigned int i = threadIdx.x; i < height; i += 32) {
@@ -166,7 +167,7 @@ __global__ void kMaxColumnwise(float* mat, float* target, unsigned int width, un
     __syncthreads();
 
     if (threadIdx.x == 0) {
-        cur_max = FLT_MIN;
+        cur_max = -FLT_MAX;
 
         for (unsigned int i = 0; i < 32; i++)
             if (max_vals[i] > cur_max)
