@@ -174,7 +174,7 @@ class CUDAMatrix(object):
             
 
     @staticmethod
-    def init_random(seed):
+    def init_random(seed = 0):
         """
         Initialize and seed the random number generator.
         """
@@ -291,6 +291,20 @@ class CUDAMatrix(object):
 
         return CUDAMatrix(mat)
 
+    def get_col_slice(self, first_col, last_col, target = None):
+        col_slice = self.slice(first_col, last_col)
+
+        if target:
+            target.assign(col_slice)
+            return target
+        else:
+            return col_slice
+
+    def set_col_slice(self, first_col, last_col, mat):
+        self.slice(first_col, last_col).assign(mat)
+
+        return self
+
     def get_row_slice(self, start, end, target = None):
         """
         Get the rows with indices start through end. If target is not provided
@@ -310,8 +324,7 @@ class CUDAMatrix(object):
 
     def set_row_slice(self, start, end, mat):
         """
-        Get the rows with indices start through end. If target is not provided
-        memory for a new matrix will be allocated.
+        Assign the contents of mat to the rows with indices start through end.
         """
 
         err_code = _cudamat.set_row_slice(mat.p_mat, self.p_mat, ct.c_int(start), ct.c_int(end))
@@ -928,9 +941,13 @@ def cublas_init():
     _cudamat.cublas_init()
     CUDAMatrix.ones = CUDAMatrix(np.ones((MAX_ONES, 1), dtype=np.float32, order = 'F'))
 
+init = cublas_init
+
 def cublas_shutdown():
     """
     Shut down Cublas.
     """
 
     _cudamat.cublas_shutdown()
+
+shutdown = cublas_shutdown

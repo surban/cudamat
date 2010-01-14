@@ -1,6 +1,9 @@
 Version 0.3
 - Fixed bug in max that showed up when an entire column was negative.
 - Fixed bug in activation computations in examples/rbm_numpy.py.
+- Added get_col_slice and set_col_slice methods.
+- Added init and shutdown methods to shorten cublas_init and cublas_shutdown.
+- Added bound checking to the various slicing methods.
 
 Version 0.2
 - Methods add, subtract, mult, divide can now take scalars as well as instances of CUDAMatrix.

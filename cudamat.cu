@@ -167,11 +167,11 @@ extern int copy_on_device(cudamat* mat1, cudamat* mat2) {
         return 0;
 }
 
-extern int get_row_slice(cudamat* source, cudamat* target, int start, int end) {
+extern int get_row_slice(cudamat* source, cudamat* target, unsigned int start, unsigned int end) {
     int height = source->size[0];
     int width = source->size[1];
 
-    if ((end - start) != target->size[0] || source->size[1] != target->size[1])
+    if ((end - start) != target->size[0] || source->size[1] != target->size[1] || start >= end || end > height)
         return ERROR_INCOMPATIBLE_DIMENSIONS;
 
     dim3 kernelBlockGrid((int)ceil((end - start)/32.), (int)ceil(width/32.), 1);
@@ -187,11 +187,11 @@ extern int get_row_slice(cudamat* source, cudamat* target, int start, int end) {
         return 0;
 }
 
-extern int set_row_slice(cudamat* source, cudamat* target, int start, int end) {
+extern int set_row_slice(cudamat* source, cudamat* target, unsigned int start, unsigned int end) {
     int height = target->size[0];
     int width = target->size[1];
 
-    if ((end - start) != source->size[0] || source->size[1] != target->size[1])
+    if ((end - start) != source->size[0] || source->size[1] != target->size[1] || start >= end || end > height)
         return ERROR_INCOMPATIBLE_DIMENSIONS;
 
     dim3 kernelBlockGrid((int)ceil((end - start)/32.), (int)ceil(width/32.), 1);
@@ -263,6 +263,9 @@ extern int get_slice(cudamat* source, cudamat* target, unsigned int first_col, u
     if (!source->on_device)
         return ERROR_NOT_ON_DEVICE;
 
+    if (last_col > source->size[1] || (first_col >= last_col))
+        return ERROR_INCOMPATIBLE_DIMENSIONS;
+
     int num_rows = source->size[0];
 
     target->data_host = 0;
@@ -288,6 +291,9 @@ extern int get_vector_slice(cudamat* source, cudamat* target, unsigned int first
     if (!source->on_device)
         return ERROR_NOT_ON_DEVICE;
 
+    if (first_ind >= last_ind)
+        return ERROR_INCOMPATIBLE_DIMENSIONS;
+
     int num_rows = source->size[0];
 
     target->data_host = 0;
@@ -298,9 +304,15 @@ extern int get_vector_slice(cudamat* source, cudamat* target, unsigned int first
     target->owns_data = 0;
 
     if (source->size[0] > 1) {
+        if (last_ind > source->size[0])
+            return ERROR_INCOMPATIBLE_DIMENSIONS;
+
         target->size[0] = last_ind - first_ind;
         target->size[1] = 1;
     } else {
+        if (last_ind > source->size[1])
+            return ERROR_INCOMPATIBLE_DIMENSIONS;
+
         target->size[0] = 1;
         target->size[1] = last_ind - first_ind;
     }
