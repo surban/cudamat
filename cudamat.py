@@ -1,10 +1,13 @@
-import os, pdb, time, warnings
+import os, pdb, platform, time, warnings
 import ctypes as ct
 import numpy as np
 
 MAX_ONES = 1024*256
 
-_cudamat = ct.cdll.LoadLibrary('libcudamat.so')
+if platform.system() == 'Windows':
+    _cudamat = ct.cdll.LoadLibrary('libcudamat.dll')
+else:
+    _cudamat = ct.cdll.LoadLibrary('libcudamat.so')
 
 _cudamat.get_last_cuda_error.restype = ct.c_char_p
 _cudamat.cublas_init.restype = ct.c_int
