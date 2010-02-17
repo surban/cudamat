@@ -24,19 +24,19 @@ num_vis = dat.shape[0]
 num_hid = 4096
 
 # initialize weights
-w_vh = cm.CUDAMatrix(cm.reformat(0.1 * np.random.randn(num_vis, num_hid)))
-w_v = cm.CUDAMatrix(cm.reformat(np.zeros((num_vis, 1))))
-w_h = cm.CUDAMatrix(cm.reformat(-4.*np.ones((num_hid, 1))))
+w_vh = cm.CUDAMatrix(0.1 * np.random.randn(num_vis, num_hid))
+w_v = cm.CUDAMatrix(np.zeros((num_vis, 1)))
+w_h = cm.CUDAMatrix(-4.*np.ones((num_hid, 1)))
 
 # initialize weight updates
-wu_vh = cm.CUDAMatrix(cm.reformat(np.zeros((num_vis, num_hid))))
-wu_v = cm.CUDAMatrix(cm.reformat(np.zeros((num_vis, 1))))
-wu_h = cm.CUDAMatrix(cm.reformat(np.zeros((num_hid, 1))))
+wu_vh = cm.CUDAMatrix(np.zeros((num_vis, num_hid)))
+wu_v = cm.CUDAMatrix(np.zeros((num_vis, 1)))
+wu_h = cm.CUDAMatrix(np.zeros((num_hid, 1)))
 
 # initialize temporary storage
-v = cm.CUDAMatrix(cm.reformat(np.empty((num_vis, batch_size))))
-h = cm.CUDAMatrix(cm.reformat(np.empty((num_hid, batch_size))))
-r = cm.CUDAMatrix(cm.reformat(np.empty((num_hid, batch_size))))
+v = cm.empty((num_vis, batch_size))
+h = cm.empty((num_hid, batch_size))
+r = cm.empty((num_hid, batch_size))
 
 start_time = time.time()
 for epoch in range(num_epochs):
@@ -49,9 +49,9 @@ for epoch in range(num_epochs):
         v.assign(v_true)
 
         # apply momentum
-        wu_vh.mult_by_scalar(momentum)
-        wu_v.mult_by_scalar(momentum)
-        wu_h.mult_by_scalar(momentum)
+        wu_vh.mult(momentum)
+        wu_v.mult(momentum)
+        wu_h.mult(momentum)
 
         # positive phase
         cm.dot(w_vh.T, v, target = h)
