@@ -134,8 +134,8 @@ extern int copy_to_device(cudamat* mat) {
     int len = mat->size[0]*mat->size[1];
     int err_code = 0;
 
-    if (!mat->owns_data)
-        return VIEW_ERROR;
+    //if (!mat->owns_data)
+    //    return VIEW_ERROR;
 
     if (!mat->on_device) {
         err_code = allocate_device_memory(mat);

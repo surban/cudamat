@@ -4,6 +4,7 @@ Version 0.3
 - Added get_col_slice and set_col_slice methods.
 - Added init and shutdown methods to shorten cublas_init and cublas_shutdown.
 - Added bound checking to the various slicing methods.
+- Fixed problem with pow and negative numbers.
 
 Version 0.2
 - Methods add, subtract, mult, divide can now take scalars as well as instances of CUDAMatrix.

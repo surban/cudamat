@@ -552,7 +552,7 @@ def test_sqrt():
 def test_pow():
     m = 256
     n = 128
-    a = np.array(np.random.rand(m, n)*20, dtype=np.float32, order='F')
+    a = np.array(np.random.randn(m, n)*20, dtype=np.float32, order='F')
     b = np.array(np.random.rand(m, n), dtype=np.float32, order='F')
     p = 2
 
