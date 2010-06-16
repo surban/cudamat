@@ -44,6 +44,7 @@ __global__ void kLog(float* mat, float* target, unsigned int len);
 __global__ void kExp(float* mat, float* target, unsigned int len);
 __global__ void kSqrt(float* mat, float* target, unsigned int len);
 __global__ void kPow(float* mat, float pow, float* target, unsigned int len);
+__global__ void kPowMatrix(float* mat, float* pow, float* target, unsigned int len);
 __global__ void kReciprocal(float* mat, float* target, unsigned int len);
 __global__ void kAddColVector(float* mat, float* vec, float* tgtMat, unsigned int width, unsigned int height);
 __global__ void kAddRowVector(float* mat, float* vec, float* tgtMat, unsigned int width, unsigned int height);

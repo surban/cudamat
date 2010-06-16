@@ -48,6 +48,7 @@ _cudamat.apply_log.restype = ct.c_int
 _cudamat.apply_exp.restype = ct.c_int
 _cudamat.apply_sqrt.restype = ct.c_int
 _cudamat.apply_pow.restype = ct.c_int
+_cudamat.apply_pow_matrix.restype = ct.c_int
 _cudamat.reciprocal.restype = ct.c_int
 
 _cudamat.add_elementwise.restype = ct.c_int
@@ -544,7 +545,7 @@ class CUDAMatrix(object):
 
     def sign(self, target = None):
         """
-        Find the sum of each element of the matrix.
+        Find the sign of each element of the matrix.
         """
 
         if not target:
@@ -905,13 +906,21 @@ def sqrt(mat, target = None):
 
 def pow(mat, p, target = None):
     """
-    Compute the 'p'th power of each element of the matrix mat.
+    If p is a scalar, compute the 'p'th power of each element of the matrix mat,
+    otherwise raise each element of the matrix mat to the power given by the
+    corresponding element of the matrix p.
     """
 
     if not target:
         target = mat
 
-    err_code = _cudamat.apply_pow(mat.p_mat, ct.c_float(p), target.p_mat)
+    if isinstance(p, CUDAMatrix):
+        err_code = _cudamat.apply_pow_matrix(mat.p_mat, p.p_mat, target.p_mat)
+    elif isinstance(p, (int, float)):
+        err_code = _cudamat.apply_pow(mat.p_mat, ct.c_float(p), target.p_mat)
+    else:
+        raise ValueError, "Value must be of type CUDAMatrix, int, or float."
+
     if err_code:
         raise generate_exception(err_code)
 

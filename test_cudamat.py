@@ -569,6 +569,28 @@ def test_pow():
     assert np.max(np.abs(c - m1.numpy_array)) < 10**-3, "Error in cudamat.pow exceeded threshold"
     assert np.max(np.abs(c - m2.numpy_array)) < 10**-3, "Error in cudamat.pow exceeded threshold"
 
+def test_pow_matrix():
+    m = 256
+    n = 128
+    a = np.array(np.random.rand(m, n)*20, dtype=np.float32, order='F')
+    b = np.array(np.random.rand(m, n), dtype=np.float32, order='F')
+    p = np.array(np.random.randn(m, n), dtype=np.float32, order='F')
+
+
+    c = a**p
+
+    m1 = cm.CUDAMatrix(a)
+    m2 = cm.CUDAMatrix(b)
+    mp = cm.CUDAMatrix(p)
+    cm.pow(m1, mp, target = m2)
+    cm.pow(m1, mp)
+
+    m1.copy_to_host()
+    m2.copy_to_host()
+
+    assert np.max(np.abs(c - m1.numpy_array)) < 10**-2, "Error in cudamat.pow exceeded threshold"
+    assert np.max(np.abs(c - m2.numpy_array)) < 10**-2, "Error in cudamat.pow exceeded threshold"
+
 def test_reciprocal():
     m = 256
     n = 128

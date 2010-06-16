@@ -731,6 +731,28 @@ extern int apply_pow(cudamat* mat, float pow, cudamat* target) {
     return 0;
 }
 
+extern int apply_pow_matrix(cudamat* mat, cudamat* pow, cudamat* target) {
+    unsigned int len = mat->size[0] * mat->size[1];
+
+    if (!mat->on_device || !target->on_device)
+        return ERROR_NOT_ON_DEVICE;
+
+    if (mat->size[0] != target->size[0] || mat->size[1] != target->size[1])
+        return ERROR_INCOMPATIBLE_DIMENSIONS;
+
+    if (mat->size[0] != pow->size[0] || mat->size[1] != pow->size[1])
+        return ERROR_INCOMPATIBLE_DIMENSIONS;
+
+    kPowMatrix<<<NUM_VECTOR_OP_BLOCKS,NUM_VECTOR_OP_THREADS_PER_BLOCK>>>(mat->data_device, pow->data_device, target->data_device, len);
+
+    cudaThreadSynchronize();
+
+    if (checkCUDAError())
+        return CUDA_ERROR;
+
+    return 0;
+}
+
 extern int reciprocal(cudamat* mat, cudamat* target) {
     unsigned int len = mat->size[0] * mat->size[1];
 
