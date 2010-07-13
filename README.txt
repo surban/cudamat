@@ -5,6 +5,7 @@ Version 0.3
 - Added init and shutdown methods to shorten cublas_init and cublas_shutdown.
 - Added bound checking to the various slicing methods.
 - Fixed problem with pow and negative numbers.
+- Added support for matrix powers in pow.
 
 Version 0.2
 - Methods add, subtract, mult, divide can now take scalars as well as instances of CUDAMatrix.
