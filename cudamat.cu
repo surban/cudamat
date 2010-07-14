@@ -114,8 +114,9 @@ extern int allocate_device_memory(cudamat* mat) {
 
     if (stat != CUBLAS_STATUS_SUCCESS || check_cublas_error())
         return CUBLAS_ERROR;
-    else
-        return 0;
+
+    mat->on_device = 1;
+    return 0;
 }
 
 extern int copy_to_host(cudamat* mat) {
@@ -149,10 +150,8 @@ extern int copy_to_device(cudamat* mat) {
     
     if (check_cublas_error())
         return CUBLAS_ERROR;
-    else {
-        mat->on_device = 1;
-        return 0;
-    }
+
+    return 0;
 }
 
 extern int copy_on_device(cudamat* mat1, cudamat* mat2) {
