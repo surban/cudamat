@@ -1,4 +1,6 @@
 Version 0.3
+- on_device should now work as intended.
+- allocate_device_memory now returns an error when cublasAlloc fails.
 - Fixed bug in max that showed up when an entire column was negative.
 - Fixed bug in activation computations in examples/rbm_numpy.py.
 - Added get_col_slice and set_col_slice methods.
