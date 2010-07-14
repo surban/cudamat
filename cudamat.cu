@@ -336,7 +336,7 @@ extern void init_from_array(cudamat* mat, float* data, int m, int n) {
 extern int init_empty(cudamat* mat, int m, int n) {
     mat->size[0] = m;
     mat->size[1] = n;
-    mat->on_device = 1;
+    mat->on_device = 0;
     mat->on_host = 0;
     mat->is_trans = 0;
     mat->owns_data = 1;
