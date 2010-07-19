@@ -59,4 +59,5 @@ __global__ void kMultScalar(float* mat, float alpha, float* dest, unsigned int l
 __global__ void kAssignScalar(float* dest, float alpha, unsigned int len);
 __global__ void kDivideScalar(float* mat, float alpha, float* dest, unsigned int len);
 __global__ void kAddScalar(float* a, float alpha, float* dest, unsigned int numEls);
+__global__ void kSelectRows(float* source, float* target, float* indices, int nRowIs, int nCols, int nSourceRows);
 #endif

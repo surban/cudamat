@@ -237,10 +237,12 @@ extern int copy_transpose(cudamat* source, cudamat* target) {
 
 extern int free_device_memory(cudamat* mat) {
     if (mat->owns_data && mat->on_device) {
-        cublasFree(mat->data_device);
+        cublasStatus stat;
+
+        stat = cublasFree(mat->data_device);
         mat->on_device = 0;
 
-        if (check_cublas_error())
+        if (stat != CUBLAS_STATUS_SUCCESS || check_cublas_error())
             return CUBLAS_ERROR;
     }
 
@@ -1029,6 +1031,23 @@ extern float euclid_norm(cudamat* mat, int* err_code) {
         *err_code = 0;
         return res;
     }
+}
+
+extern int selectRows(cudamat* source, cudamat* target, cudamat* indices){
+    const int nRetRows = indices->size[1];
+
+    if (nRetRows==0) return 0;
+
+    dim3 gridDim((nRetRows+31)/32);
+    dim3 blockDim(32);
+
+    kSelectRows<<<gridDim, blockDim>>>(source->data_device, target->data_device, indices->data_device, nRetRows, source->size[0], source->size[1]);
+    cudaThreadSynchronize();
+
+    if (checkCUDAError())
+        return CUDA_ERROR;
+    else
+        return 0;
 }
 
 }

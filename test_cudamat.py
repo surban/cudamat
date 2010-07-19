@@ -904,5 +904,24 @@ def test_euclid_norm():
 
     assert np.abs(n1-n2) < 10**-2, "Error in CUDAMatrix.euclid_norm exceeded threshold"
 
+def test_select_columns():
+    m = 256
+    n = 128
+    k = 8
+
+    s = np.array(np.random.randn(m, n), dtype=np.float32, order='F')
+    i_l = [0, 1, 2, 3, 5, 10, 12, 20]
+    i = np.array(i_l).T[np.newaxis, :]
+    t = np.empty((m, k))
+    
+    s_d = cm.CUDAMatrix(s)
+    i_d = cm.CUDAMatrix(i)
+    t_d = cm.CUDAMatrix(t)
+
+    s_d.select_columns(i_d, t_d)
+    res = s[:,i_l]
+
+    assert np.max(np.abs(res - t_d.asarray())) < 10**-4, "Error in CUDAMatrix.select_columns exceeded threshold"
+
 if __name__ == '__main__':
     nose.run()

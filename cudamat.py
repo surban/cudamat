@@ -61,6 +61,7 @@ _cudamat.divide_by_scalar.restype = ct.c_int
 _cudamat.add_scalar.restype = ct.c_int
 
 _cudamat.euclid_norm.restype = ct.c_float
+_cudamat.selectRows.restype = ct.c_int
 _cudamat.vdot.restype = ct.c_float
 _cudamat.dot.restype = ct.c_int
 
@@ -771,6 +772,23 @@ class CUDAMatrix(object):
             raise generate_exception(err_code.value)
 
         return res
+
+    def select_columns(self, indices, target):
+        """
+        copies some columns of self into target.
+        <indices> must be a row vector. Its elements are float32's representing integers, e.g. "34.0" means the integer "34".
+        after this call, for all r,c, target[r,c]=self[r,indices[c]].
+        This returns target.
+        Negative indices are interpreted in the usual Python way: all elements of <indices> had better be in the range [-self.shape[1], self.shape[1]-1].
+        This does bounds checking, but out of bounds indices do not raise an exception (because the programmer was lazy). Instead, they result in NaN values in <target>.
+        """
+
+        err_code = _cudamat.selectRows(self.p_mat, target.p_mat, indices.p_mat)
+
+        if err_code:
+            raise generate_exception(err_code)
+
+        return target
 
 def empty(shape):
     """
