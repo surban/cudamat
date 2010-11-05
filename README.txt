@@ -1,4 +1,5 @@
 Version 0.3
+- Some bug fixes. Contributed by Jonathan Taylor.
 - Added the select_columns method. Code contributed by Tijmen Tieleman.
 - on_device should now work as intended.
 - allocate_device_memory now returns an error when cublasAlloc fails.

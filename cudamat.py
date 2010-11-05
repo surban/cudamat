@@ -170,13 +170,18 @@ class CUDAMatrix(object):
 
         self.T = TransposedCUDAMatrix(self.mat)
 
+        # Keep a reference to free device memory in case of a crash.
+        self.__free_device_memory = _cudamat.free_device_memory
+
 
     def __del__(self):
-        if 'p_mat' in self.__dict__:
-            err_code = _cudamat.free_device_memory(self.p_mat)
-            if err_code:
-                raise generate_exception(err_code)
-            
+        try:
+            if 'p_mat' in self.__dict__:
+                err_code = self.__free_device_memory(self.p_mat)
+                if err_code:
+                    raise generate_exception(err_code)
+        except AttributeError:
+            pass
 
     @staticmethod
     def init_random(seed = 0):
@@ -294,7 +299,14 @@ class CUDAMatrix(object):
         if err_code:
             raise generate_exception(err_code)
 
-        return CUDAMatrix(mat)
+        new_mat = CUDAMatrix(mat)
+
+        try:
+            new_mat.sliceof = self.sliceof
+        except:
+            new_mat.sliceof = self
+
+        return new_mat
 
     def get_col_slice(self, first_col, last_col, target = None):
         col_slice = self.slice(first_col, last_col)
@@ -978,6 +990,7 @@ def cublas_shutdown():
     Shut down Cublas.
     """
 
+    CUDAMatrix.ones = 0
     _cudamat.cublas_shutdown()
 
 shutdown = cublas_shutdown
