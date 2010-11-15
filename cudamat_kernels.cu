@@ -195,6 +195,42 @@ __global__ void kApplySigmoid(float* mat, float* target, unsigned int len) {
     }
 }
 
+
+__global__ void kApplyTanh(float* mat, float* target, unsigned int len) {
+    const unsigned int idx = blockIdx.x * blockDim.x + threadIdx.x;
+    const unsigned int numThreads = blockDim.x * gridDim.x;
+    float mat_i, exp2x;
+
+    for (unsigned int i = idx; i < len; i += numThreads) {
+        mat_i = mat[i];
+        exp2x = __expf(2 * mat_i);
+        target[i] = 1 - 2 / (exp2x + 1);
+    }
+}
+
+__global__ void kApplyAbs(float* mat, float* target, unsigned int len) {
+    const unsigned int idx = blockIdx.x * blockDim.x + threadIdx.x;
+    const unsigned int numThreads = blockDim.x * gridDim.x;
+    
+    for (unsigned int i = idx; i < len; i += numThreads) {
+        target[i] = mat[i] * ((mat[i] > 0) - (mat[i] < 0));
+    }
+}
+
+__global__ void kApplyLog1PlusExp(float* mat, float* target, unsigned int len) {
+    const unsigned int idx = blockIdx.x * blockDim.x + threadIdx.x;
+    const unsigned int numThreads = blockDim.x * gridDim.x;
+    float mat_i;
+
+    for (unsigned int i = idx; i < len; i += numThreads) {
+        mat_i = mat[i];
+        if (mat_i > 0)
+            target[i] = (__logf(1 + __expf(-mat_i)) + mat_i);
+        else
+            target[i] = __logf(1 + __expf(mat_i));
+    }
+}
+
 __global__ void kLog(float* mat, float* target, unsigned int len) {
     const unsigned int idx = blockIdx.x * blockDim.x + threadIdx.x;
     const unsigned int numThreads = blockDim.x * gridDim.x;
@@ -376,8 +412,10 @@ __global__ void kSelectRows(float* source, float* target, float* indices, int nR
     // cooperatively load 32 row indices
     if (tid < localNRowIs){
         sourceRowIndices[tid] = int(indices[startTargetRowI + tid]);
-        if (sourceRowIndices[tid]<0) sourceRowIndices[tid] += nSourceRows;
-        if (sourceRowIndices[tid]<0 || sourceRowIndices[tid]>=nSourceRows) sourceRowIndices[tid] = -1;
+        if (sourceRowIndices[tid]<0)
+            sourceRowIndices[tid] += nSourceRows;
+        if (sourceRowIndices[tid]<0 || sourceRowIndices[tid]>=nSourceRows)
+            sourceRowIndices[tid] = -1;
     }
     __syncthreads();
 
@@ -385,6 +423,30 @@ __global__ void kSelectRows(float* source, float* target, float* indices, int nR
     for (int i=0; i<localNRowIs; i++){
         const int targetRowI = startTargetRowI + i, sourceRowI = sourceRowIndices[i];
         for (int colI=tid; colI<nCols; colI+=32)
-        target[targetRowI * nCols + colI] = sourceRowI==-1 ? (1.0/0.0 -1.0/0.0) : source[sourceRowI * nCols + colI];
+            target[targetRowI * nCols + colI] = sourceRowI==-1 ? (1.0/0.0 -1.0/0.0) : source[sourceRowI * nCols + colI];
+    }
+}
+
+__global__ void kSetSelectedRows(float* target, float* source, float* indices, int nRowIs, int nCols, int nTargetRows){
+    __shared__ int targetRowIndices[32];
+    const int startSourceRowI = blockIdx.x * 32;
+    const int tid = threadIdx.x;
+    const int localNRowIs = min(32, nRowIs-startSourceRowI);
+
+    // cooperatively load 32 row indices
+    if (tid < localNRowIs){
+        targetRowIndices[tid] = int(indices[startSourceRowI + tid]);
+        if (targetRowIndices[tid]<0)
+            targetRowIndices[tid] += nTargetRows;
+        if (targetRowIndices[tid]<0 || targetRowIndices[tid]>=nTargetRows)
+            targetRowIndices[tid] = -1;
+    }
+    __syncthreads();
+
+    // copy 32 rows
+    for (int i=0; i<localNRowIs; i++){
+        const int sourceRowI = startSourceRowI + i, targetRowI = targetRowIndices[i];
+        for (int colI=tid; colI<nCols; colI+=32)
+            target[targetRowI * nCols + colI] = targetRowI==-1 ? (1.0/0.0 -1.0/0.0) : source[sourceRowI * nCols + colI];
     }
 }

@@ -1,4 +1,6 @@
 Version 0.3
+- Added the set_selected_columns. Contributed by Tijmen Tieleman.
+- Added tanh, abs, and log_1_plus_exp. Contributed by Ilya Sutskever.
 - Some bug fixes. Contributed by Jonathan Taylor.
 - Added the select_columns method. Code contributed by Tijmen Tieleman.
 - on_device should now work as intended.

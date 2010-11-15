@@ -39,7 +39,9 @@ __global__ void kGreaterThanScalar(float* mat, float val, float* target, unsigne
 __global__ void kMaxColumnwise(float* mat, float* target, unsigned int width, unsigned int height);
 __global__ void kSign(float* mat, float* target, unsigned int len);
 __global__ void kApplySigmoid(float* mat, float* target, unsigned int len);
-//__global__ void kApplyInvSigmoid(float* mat, float* target, unsigned int len);
+__global__ void kApplyTanh(float* mat, float* target, unsigned int len);
+__global__ void kApplyAbs(float* mat, float* target, unsigned int len);
+__global__ void kApplyLog1PlusExp(float* mat, float* target, unsigned int len);
 __global__ void kLog(float* mat, float* target, unsigned int len);
 __global__ void kExp(float* mat, float* target, unsigned int len);
 __global__ void kSqrt(float* mat, float* target, unsigned int len);
@@ -60,4 +62,5 @@ __global__ void kAssignScalar(float* dest, float alpha, unsigned int len);
 __global__ void kDivideScalar(float* mat, float alpha, float* dest, unsigned int len);
 __global__ void kAddScalar(float* a, float alpha, float* dest, unsigned int numEls);
 __global__ void kSelectRows(float* source, float* target, float* indices, int nRowIs, int nCols, int nSourceRows);
+__global__ void kSetSelectedRows(float* target, float* source, float* indices, int nRowIs, int nCols, int nTargetRows);
 #endif
