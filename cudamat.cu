@@ -115,8 +115,10 @@ extern int allocate_device_memory(cudamat* mat) {
 
     stat = cublasAlloc(len, sizeof(mat->data_device[0]), (void**)&mat->data_device);
 
-    if (stat != CUBLAS_STATUS_SUCCESS || check_cublas_error())
+    if (stat != CUBLAS_STATUS_SUCCESS || check_cublas_error()) {
+        checkCUDAError();
         return CUBLAS_ERROR;
+    }
 
     mat->on_device = 1;
     return 0;
