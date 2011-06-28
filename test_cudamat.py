@@ -290,10 +290,10 @@ def test_sum():
     mt2.copy_to_host()
     mt2r.copy_to_host()
 
-    assert np.max(np.abs(c1 - mt1.numpy_array)) < 10**-4, "Error in CUDAMatrix.sum exceeded threshold"
-    assert np.max(np.abs(c1 - mt1r.numpy_array)) < 10**-4, "Error in CUDAMatrix.sum exceeded threshold"
-    assert np.max(np.abs(c2 - mt2.numpy_array)) < 10**-4, "Error in CUDAMatrix.sum exceeded threshold"
-    assert np.max(np.abs(c2 - mt2r.numpy_array)) < 10**-4, "Error in CUDAMatrix.sum exceeded threshold"
+    assert np.max(np.abs(c1 - mt1.numpy_array)) < 10**-3, "Error in CUDAMatrix.sum exceeded threshold"
+    assert np.max(np.abs(c1 - mt1r.numpy_array)) < 10**-3, "Error in CUDAMatrix.sum exceeded threshold"
+    assert np.max(np.abs(c2 - mt2.numpy_array)) < 10**-3, "Error in CUDAMatrix.sum exceeded threshold"
+    assert np.max(np.abs(c2 - mt2r.numpy_array)) < 10**-3, "Error in CUDAMatrix.sum exceeded threshold"
 
 def test_sum_trans():
     m = 256
@@ -321,10 +321,10 @@ def test_sum_trans():
     mt2.copy_to_host()
     mt2r.copy_to_host()
 
-    assert np.max(np.abs(c1 - mt1.numpy_array)) < 10**-4, "Error in CUDAMatrix.sum exceeded threshold"
-    assert np.max(np.abs(c1 - mt1r.numpy_array)) < 10**-4, "Error in CUDAMatrix.sum exceeded threshold"
-    assert np.max(np.abs(c2 - mt2.numpy_array)) < 10**-4, "Error in CUDAMatrix.sum exceeded threshold"
-    assert np.max(np.abs(c2 - mt2r.numpy_array)) < 10**-4, "Error in CUDAMatrix.sum exceeded threshold"
+    assert np.max(np.abs(c1 - mt1.numpy_array)) < 10**-3, "Error in CUDAMatrix.sum exceeded threshold"
+    assert np.max(np.abs(c1 - mt1r.numpy_array)) < 10**-3, "Error in CUDAMatrix.sum exceeded threshold"
+    assert np.max(np.abs(c2 - mt2.numpy_array)) < 10**-3, "Error in CUDAMatrix.sum exceeded threshold"
+    assert np.max(np.abs(c2 - mt2r.numpy_array)) < 10**-3, "Error in CUDAMatrix.sum exceeded threshold"
 
 def test_add_sums():
     m = 256
@@ -349,8 +349,8 @@ def test_add_sums():
     mt1.copy_to_host()
     mt2.copy_to_host()
 
-    assert np.max(np.abs(c1 - mt1.numpy_array)) < 10**-4, "Error in CUDAMatrix.add_sums exceeded threshold"
-    assert np.max(np.abs(c2 - mt2.numpy_array)) < 10**-4, "Error in CUDAMatrix.add_sums exceeded threshold"
+    assert np.max(np.abs(c1 - mt1.numpy_array)) < 10**-3, "Error in CUDAMatrix.add_sums exceeded threshold"
+    assert np.max(np.abs(c2 - mt2.numpy_array)) < 10**-3, "Error in CUDAMatrix.add_sums exceeded threshold"
 
 
 def test_less_than():

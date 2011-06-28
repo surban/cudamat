@@ -38,10 +38,7 @@ extern int cublas_init() {
 
 extern int cublas_shutdown() {
     cublasShutdown();
-    if (check_cublas_error())
-        return CUBLAS_ERROR;
-    else
-        return 0;
+    cudaThreadExit();
 }
 
 
@@ -858,6 +855,8 @@ extern int dot(cudamat* mat1, cudamat* mat2, cudamat* target, float beta, float 
 
     if (check_cublas_error())
         return CUBLAS_ERROR;
+
+    cudaThreadSynchronize();
 
     return 0;
 }
