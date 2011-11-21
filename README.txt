@@ -1,4 +1,5 @@
 Version 0.3
+- Added equality testing. Contributed by Ryan P. Adams.
 - Added the set_selected_columns. Contributed by Tijmen Tieleman.
 - Added tanh, abs, and log_1_plus_exp. Contributed by Ilya Sutskever.
 - Some bug fixes. Contributed by Jonathan Taylor.
