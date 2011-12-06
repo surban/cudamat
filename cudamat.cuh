@@ -1,3 +1,5 @@
+#define SYNC_THREADS 0
+
 #define ERROR_INCOMPATIBLE_DIMENSIONS -1
 #define CUBLAS_ERROR -2
 #define CUDA_ERROR -3
