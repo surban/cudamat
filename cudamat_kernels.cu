@@ -150,6 +150,24 @@ __global__ void kGreaterThanScalar(float* mat, float val, float* target, unsigne
     }
 }
 
+__global__ void kEquals(float* mat1, float* mat2, float* target, unsigned int len) {
+    const unsigned int idx = blockIdx.x * blockDim.x + threadIdx.x;
+    const unsigned int numThreads = blockDim.x * gridDim.x;
+
+    for (unsigned int i = idx; i < len; i += numThreads) {
+        target[i] = mat1[i] == mat2[i];
+    }
+}
+
+__global__ void kEqualsScalar(float* mat, float val, float* target, unsigned int len) {
+    const unsigned int idx = blockIdx.x * blockDim.x + threadIdx.x;
+    const unsigned int numThreads = blockDim.x * gridDim.x;
+
+    for (unsigned int i = idx; i < len; i += numThreads) {
+        target[i] = mat[i] == val;
+    }
+}
+
 __global__ void kMaxColumnwise(float* mat, float* target, unsigned int width, unsigned int height) {
     __shared__ float max_vals[32];
     float cur_max = -FLT_MAX;

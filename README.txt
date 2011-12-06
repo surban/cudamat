@@ -1,4 +1,5 @@
 Version 0.3
+- Added equality testing. Contributed by Ryan P. Adams.
 - Added flag that determines whether threads are synced after each call.
 - Added direct blas calls for two elementwise operations. Contributed by Vincent Vanhoucke.
 - Added the set_selected_columns. Contributed by Tijmen Tieleman.
