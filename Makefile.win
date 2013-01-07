@@ -1,4 +1,4 @@
 all:
-	cd cudamake
+	cd cudamat
 	nmake -f Makefile.win
 	
