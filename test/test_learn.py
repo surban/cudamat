@@ -2,7 +2,7 @@ import pdb
 import numpy as np
 import nose
 import cudamat as cm
-import learn as cl
+import cudamat.learn as cl
 
 def setup():
     cm.cublas_init()

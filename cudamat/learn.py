@@ -3,9 +3,12 @@ import platform
 import warnings
 import ctypes as ct
 import numpy as np
+import os
 from cudamat import generate_exception
 
 if platform.system() == 'Windows':
+    mydir = os.path.dirname(__file__)
+    os.environ['PATH'] += ";" + mydir
     _cudalearn = ct.cdll.LoadLibrary('libcudalearn.dll')
 else:
     _cudalearn = ct.cdll.LoadLibrary('libcudalearn.so')

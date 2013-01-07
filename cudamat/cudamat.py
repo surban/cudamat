@@ -5,6 +5,8 @@ import numpy as np
 MAX_ONES = 1024*256
 
 if platform.system() == 'Windows':
+    mydir = os.path.dirname(__file__)
+    os.environ['PATH'] += ";" + mydir
     _cudamat = ct.cdll.LoadLibrary('libcudamat.dll')
 else:
     _cudamat = ct.cdll.LoadLibrary('libcudamat.so')
