@@ -10,3 +10,19 @@ INSTALLATION INSTRUCTIONS:
 
    python test_cudamat.py
 
+
+For Windows:
+
+1. Install a Python distribution (tested with EPD Version 7.3-2 x64) 
+
+2. Install Visual Studio 2008 with x64 compilers.
+
+3. Open a Visual Studio 2008 x64 Win64 Command Prompt. 
+
+4. Install the CUDA SDK. (tested with version 5)
+
+5. Run nmake -f Makefile.win in the cudamat directory.
+
+3. Make sure everything works by running the test cases:
+
+   python test_cudamat.py
