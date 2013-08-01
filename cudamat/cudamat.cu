@@ -43,6 +43,21 @@ DLLEXPORT extern int cublas_shutdown() {
     return 0;
 }
 
+const char *cublasGetErrorString(cublasStatus_t status)
+{
+    switch(status)
+    {
+        case CUBLAS_STATUS_SUCCESS: return "CUBLAS_STATUS_SUCCESS";
+        case CUBLAS_STATUS_NOT_INITIALIZED: return "CUBLAS_STATUS_NOT_INITIALIZED";
+        case CUBLAS_STATUS_ALLOC_FAILED: return "CUBLAS_STATUS_ALLOC_FAILED";
+        case CUBLAS_STATUS_INVALID_VALUE: return "CUBLAS_STATUS_INVALID_VALUE"; 
+        case CUBLAS_STATUS_ARCH_MISMATCH: return "CUBLAS_STATUS_ARCH_MISMATCH"; 
+        case CUBLAS_STATUS_MAPPING_ERROR: return "CUBLAS_STATUS_MAPPING_ERROR";
+        case CUBLAS_STATUS_EXECUTION_FAILED: return "CUBLAS_STATUS_EXECUTION_FAILED"; 
+        case CUBLAS_STATUS_INTERNAL_ERROR: return "CUBLAS_STATUS_INTERNAL_ERROR"; 
+    }
+    return "unknown error";
+}
 
 DLLEXPORT extern int cuda_set_device(int deviceId) {
     cudaSetDevice(deviceId);
@@ -113,6 +128,7 @@ DLLEXPORT extern int allocate_device_memory(cudamat* mat) {
     cublasStatus stat;
 
     stat = cublasAlloc(len, sizeof(mat->data_device[0]), (void**)&mat->data_device);
+	//printf("C: allocated device memory at %p\n", mat->data_device);
 
     if (stat != CUBLAS_STATUS_SUCCESS || check_cublas_error()) {
         checkCUDAError();
@@ -244,12 +260,15 @@ DLLEXPORT extern int copy_transpose(cudamat* source, cudamat* target) {
 DLLEXPORT extern int free_device_memory(cudamat* mat) {
     if (mat->owns_data && mat->on_device) {
         cublasStatus stat;
-
+		
+		//printf("C: Freeing device memory at %p\n", mat->data_device);
         stat = cublasFree(mat->data_device);
         mat->on_device = 0;
 
-        if (stat != CUBLAS_STATUS_SUCCESS || check_cublas_error())
+        if (stat != CUBLAS_STATUS_SUCCESS || check_cublas_error()) {
+			//printf("cublasFree: %s\n", cublasGetErrorString(stat));
             return CUBLAS_ERROR;
+		}
     }
 
     return 0;

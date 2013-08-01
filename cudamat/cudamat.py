@@ -122,6 +122,7 @@ def generate_exception(err_code):
 class cudamat(ct.Structure):
     _fields_ = [('data_host', ct.POINTER(ct.c_float)),
                 ('data_device', ct.POINTER(ct.c_float)),
+                #('data_device', ct.c_void_p),
                 ('on_device', ct.c_int),
                 ('on_host', ct.c_int),
                 ('size', ct.c_int * 2),
@@ -177,6 +178,8 @@ class CUDAMatrix(object):
             self.mat = mat
             self.p_mat = ct.pointer(self.mat)
 
+            #print "Taken over cudamat with device memory %x" % self.mat.data_device
+
         self.T = TransposedCUDAMatrix(self.mat)
 
         # Keep a reference to free device memory in case of a crash.
@@ -185,13 +188,13 @@ class CUDAMatrix(object):
 
     def __del__(self):
         try:
-            #print self.mat.owns_data
             if self.mat.owns_data != 0:
                 if 'p_mat' in self.__dict__:
+                    #print "Freeing memory at %x" % self.mat.data_device
                     err_code = self.__free_device_memory(self.p_mat)
-                    if err_code:
-                        print "CUDAMat freeing memory -- err_code:", err_code
-                        raise generate_exception(err_code)
+                    #if err_code:
+                    #    print "CUDAMat freeing memory -- err_code:", err_code
+                    #    raise generate_exception(err_code)
         except AttributeError:
             pass
 
