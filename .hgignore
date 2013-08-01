@@ -3,3 +3,4 @@ syntax: glob
 *.dll
 *.exp
 *.lib
+*.suo

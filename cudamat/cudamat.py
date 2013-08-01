@@ -1,6 +1,7 @@
 import os, pdb, platform, time, warnings
 import ctypes as ct
 import numpy as np
+import sys
 
 MAX_ONES = 1024*256
 
@@ -184,11 +185,13 @@ class CUDAMatrix(object):
 
     def __del__(self):
         try:
-            if 'p_mat' in self.__dict__:
-                err_code = self.__free_device_memory(self.p_mat)
-                if err_code:
-                    print "CUDAMat freeing memory -- err_code:", err_code
-                    raise generate_exception(err_code)
+            #print self.mat.owns_data
+            if self.mat.owns_data != 0:
+                if 'p_mat' in self.__dict__:
+                    err_code = self.__free_device_memory(self.p_mat)
+                    if err_code:
+                        print "CUDAMat freeing memory -- err_code:", err_code
+                        raise generate_exception(err_code)
         except AttributeError:
             pass
 
