@@ -192,9 +192,9 @@ class CUDAMatrix(object):
                 if 'p_mat' in self.__dict__:
                     #print "Freeing memory at %x" % self.mat.data_device
                     err_code = self.__free_device_memory(self.p_mat)
-                    #if err_code:
-                    #    print "CUDAMat freeing memory -- err_code:", err_code
-                    #    raise generate_exception(err_code)
+                    if err_code:
+                        print "CUDAMat freeing memory -- err_code:", err_code
+                        raise generate_exception(err_code)
         except AttributeError:
             pass
 
@@ -1085,6 +1085,10 @@ def cublas_shutdown():
     """
 
     CUDAMatrix.ones = 0
-    _cudamat.cublas_shutdown()
+    # Explicitly shutting down cuBLAS and the CUDA context causes problems
+    # with other libraries like pyCUDA that have CUDA cleanup operations
+    # pending at shutdown.
+    # Thus we don't close it.
+    #_cudamat.cublas_shutdown()
 
 shutdown = cublas_shutdown
