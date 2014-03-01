@@ -4,25 +4,29 @@ INSTALLATION INSTRUCTIONS:
 
 1. Install the CUDA SDK.
 
-2. Run make in the cudamat directory.
+2. Run pip install --user -e .
 
 3. Make sure everything works by running the test cases:
-
    python test_cudamat.py
 
 
+==========================================================
+   
 For Windows:
 
-1. Install a Python distribution (tested with EPD Version 7.3-2 x64) 
+1. Install a Python distribution (tested with Anaconda) 
 
-2. Install Visual Studio 2008 with x64 compilers.
+2. Install Windows SDK 7.0.
 
 3. Open a Visual Studio 2008 x64 Win64 Command Prompt. 
 
-4. Install the CUDA SDK. (tested with version 5)
+4. Install the CUDA SDK. (tested with version 5.5)
 
-5. Run nmake -f Makefile.win in the cudamat directory.
+4a. Apply the workaround for a CUDA compilter bug:
+	Copy "C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\bin\vcvars64.bat" to 
+	"C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\bin\amd64\vcvarsamd64.bat"
+
+5. Run pip install --user -e .
 
 3. Make sure everything works by running the test cases:
-
    python test_cudamat.py

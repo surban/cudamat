@@ -2,7 +2,15 @@
 # -*- coding: utf-8 -*-
 
 from setuptools import setup, find_packages
+import os, sys
 
+if os.name == 'nt':
+    ret = os.system("nmake -f Makefile.win")
+else:
+    ret = os.system("make")
+if ret != 0:
+    sys.exit(ret)
+    
 
 setup(
     name="cudamat",
