@@ -5,12 +5,12 @@ import sys
 
 MAX_ONES = 1024*256
 
+mydir = os.path.dirname(__file__)
 if platform.system() == 'Windows':
-    mydir = os.path.dirname(__file__)
     os.environ['PATH'] += ";" + mydir
     _cudamat = ct.cdll.LoadLibrary('libcudamat.dll')
 else:
-    _cudamat = ct.cdll.LoadLibrary('libcudamat.so')
+    _cudamat = ct.cdll.LoadLibrary(mydir + '/libcudamat.so')
 
 _cudamat.get_last_cuda_error.restype = ct.c_char_p
 _cudamat.cublas_init.restype = ct.c_int
