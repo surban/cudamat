@@ -2,4 +2,5 @@
 *.dll
 *.exp
 *.lib
+*.so
 cudamat.egg-info

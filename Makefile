@@ -1,4 +1,3 @@
 all:
-	cd cudamat
-	make
-	
+	make -C cudamat cudamat
+
