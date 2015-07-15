@@ -1,3 +1,9 @@
+#ifdef _WIN32
+#define DLLEXPORT __declspec(dllexport)
+#else
+#define DLLEXPORT
+#endif
+
 #define SYNC_THREADS 1
 
 #define ERROR_INCOMPATIBLE_DIMENSIONS -1

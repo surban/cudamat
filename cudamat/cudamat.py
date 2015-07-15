@@ -8,6 +8,7 @@ import numpy as np
 
 
 if platform.system() == 'Windows':
+    os.environ['PATH'] += ";" + os.path.dirname(__file__)
     _cudamat = ct.cdll.LoadLibrary('libcudamat.dll')
 else:
     _cudamat = ct.cdll.LoadLibrary(os.path.join(
@@ -1512,6 +1513,10 @@ def cublas_shutdown():
     """
 
     CUDAMatrix.ones = 0
-    _cudamat.cublas_shutdown()
+    # Explicitly shutting down cuBLAS and the CUDA context causes problems
+    # with other libraries like pyCUDA that have CUDA cleanup operations
+    # pending at shutdown.
+    # Thus we don't close it.
+    #_cudamat.cublas_shutdown()
 
 shutdown = cublas_shutdown

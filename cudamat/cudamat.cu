@@ -22,13 +22,13 @@ inline bool checkCUDAError() {
     return cudaSuccess != err;
 }
 
-extern const char* get_last_cuda_error() {
+DLLEXPORT extern const char* get_last_cuda_error() {
     cudaError_t err = cudaGetLastError();
 
     return cudaGetErrorString( err);
 }
 
-extern int cublas_init() {
+DLLEXPORT extern int cublas_init() {
     cublasInit();
     if (check_cublas_error())
         return CUBLAS_ERROR;
@@ -36,15 +36,31 @@ extern int cublas_init() {
         return 0;
 }
 
-extern int cublas_shutdown() {
+DLLEXPORT extern int cublas_shutdown() {
     cublasShutdown();
     cudaThreadExit();
 
     return 0;
 }
 
+const char *cublasGetErrorString(cublasStatus_t status)
+{
+    switch(status)
+    {
+        case CUBLAS_STATUS_SUCCESS: return "CUBLAS_STATUS_SUCCESS";
+        case CUBLAS_STATUS_NOT_INITIALIZED: return "CUBLAS_STATUS_NOT_INITIALIZED";
+        case CUBLAS_STATUS_ALLOC_FAILED: return "CUBLAS_STATUS_ALLOC_FAILED";
+        case CUBLAS_STATUS_INVALID_VALUE: return "CUBLAS_STATUS_INVALID_VALUE";
+        case CUBLAS_STATUS_ARCH_MISMATCH: return "CUBLAS_STATUS_ARCH_MISMATCH";
+        case CUBLAS_STATUS_MAPPING_ERROR: return "CUBLAS_STATUS_MAPPING_ERROR";
+        case CUBLAS_STATUS_EXECUTION_FAILED: return "CUBLAS_STATUS_EXECUTION_FAILED";
+        case CUBLAS_STATUS_INTERNAL_ERROR: return "CUBLAS_STATUS_INTERNAL_ERROR";
+    }
+    return "unknown error";
+}
 
-extern int cuda_set_device(int deviceId) {
+
+DLLEXPORT extern int cuda_set_device(int deviceId) {
     cudaSetDevice(deviceId);
     
     if (checkCUDAError())
@@ -53,7 +69,7 @@ extern int cuda_set_device(int deviceId) {
         return 0;
 }
 
-extern int init_random(rnd_struct* rnd_state, int seed, char* cudamatpath) {
+DLLEXPORT extern int init_random(rnd_struct* rnd_state, int seed, char* cudamatpath) {
     unsigned int * host_mults;
     host_mults = (unsigned int*)malloc(NUM_RND_STREAMS * sizeof(unsigned int));
     FILE * pFile;
@@ -85,15 +101,15 @@ extern int init_random(rnd_struct* rnd_state, int seed, char* cudamatpath) {
 
 /* ------------------------------ Utility routines ------------------------------ */
 
-extern int get_leading_dimension(cudamat* mat) {
+DLLEXPORT extern int get_leading_dimension(cudamat* mat) {
     return mat->is_trans ? mat->size[1] : mat->size[0];
 }
 
-extern int get_nonleading_dimension(cudamat* mat) {
+DLLEXPORT extern int get_nonleading_dimension(cudamat* mat) {
     return mat->is_trans ? mat->size[0] : mat->size[1];
 }
 
-extern void set_transpose(cudamat* mat, int is_trans) {
+DLLEXPORT extern void set_transpose(cudamat* mat, int is_trans) {
     mat->is_trans = is_trans;
 }
 
@@ -101,13 +117,13 @@ inline char get_transpose_char(cudamat* mat) {
     return mat->is_trans ? 't' : 'n';
 }
 
-extern void cuda_sync_threads() {
+DLLEXPORT extern void cuda_sync_threads() {
     cudaThreadSynchronize();
 }
 
 /* ------------------------------ Allocating/moving data ------------------------------ */
 
-extern int allocate_device_memory(cudamat* mat) {
+DLLEXPORT extern int allocate_device_memory(cudamat* mat) {
     int len = mat->size[0]*mat->size[1];
 
     cublasStatus stat;
@@ -123,7 +139,7 @@ extern int allocate_device_memory(cudamat* mat) {
     return 0;
 }
 
-extern int copy_to_host(cudamat* mat) {
+DLLEXPORT extern int copy_to_host(cudamat* mat) {
     int len = mat->size[0]*mat->size[1];
 
     if (mat->on_device) {
@@ -137,7 +153,7 @@ extern int copy_to_host(cudamat* mat) {
     return 0;
 }
 
-extern int copy_to_device(cudamat* mat) {
+DLLEXPORT extern int copy_to_device(cudamat* mat) {
     int len = mat->size[0]*mat->size[1];
     int err_code = 0;
 
@@ -158,7 +174,7 @@ extern int copy_to_device(cudamat* mat) {
     return 0;
 }
 
-extern int copy_on_device(cudamat* mat1, cudamat* mat2) {
+DLLEXPORT extern int copy_on_device(cudamat* mat1, cudamat* mat2) {
     int len = mat1->size[0]*mat1->size[1];
 
     if (mat1->size[0] != mat2->size[0] || mat1->size[1] != mat2->size[1])
@@ -172,7 +188,7 @@ extern int copy_on_device(cudamat* mat1, cudamat* mat2) {
         return 0;
 }
 
-extern int get_row_slice(cudamat* source, cudamat* target, unsigned int start, unsigned int end) {
+DLLEXPORT extern int get_row_slice(cudamat* source, cudamat* target, unsigned int start, unsigned int end) {
     int height = source->size[0];
     int width = source->size[1];
 
@@ -193,7 +209,7 @@ extern int get_row_slice(cudamat* source, cudamat* target, unsigned int start, u
         return 0;
 }
 
-extern int set_row_slice(cudamat* source, cudamat* target, unsigned int start, unsigned int end) {
+DLLEXPORT extern int set_row_slice(cudamat* source, cudamat* target, unsigned int start, unsigned int end) {
     int height = target->size[0];
     int width = target->size[1];
 
@@ -214,7 +230,7 @@ extern int set_row_slice(cudamat* source, cudamat* target, unsigned int start, u
         return 0;
 }
 
-extern int copy_transpose(cudamat* source, cudamat* target) {
+DLLEXPORT extern int copy_transpose(cudamat* source, cudamat* target) {
     unsigned int height = source->size[0];
     unsigned int width = source->size[1];
 
@@ -241,7 +257,7 @@ extern int copy_transpose(cudamat* source, cudamat* target) {
         return 0;
 }
 
-extern int free_device_memory(cudamat* mat) {
+DLLEXPORT extern int free_device_memory(cudamat* mat) {
     if (mat->owns_data && mat->on_device) {
         cublasStatus stat;
 
@@ -255,7 +271,7 @@ extern int free_device_memory(cudamat* mat) {
     return 0;
 }
 
-extern int reshape(cudamat* mat, unsigned int m, unsigned int n) {
+DLLEXPORT extern int reshape(cudamat* mat, unsigned int m, unsigned int n) {
     if (mat->size[0] * mat->size[1] != m * n)
         return ERROR_INCOMPATIBLE_DIMENSIONS;
 
@@ -265,7 +281,7 @@ extern int reshape(cudamat* mat, unsigned int m, unsigned int n) {
     return 0;
 }
 
-extern int get_slice(cudamat* source, cudamat* target, unsigned int first_col, unsigned int last_col) {
+DLLEXPORT extern int get_slice(cudamat* source, cudamat* target, unsigned int first_col, unsigned int last_col) {
     if (source->is_trans)
         return ERROR_TRANSPOSED;
 
@@ -289,7 +305,7 @@ extern int get_slice(cudamat* source, cudamat* target, unsigned int first_col, u
     return 0;
 }
 
-extern int get_vector_slice(cudamat* source, cudamat* target, unsigned int first_ind, unsigned int last_ind) {
+DLLEXPORT extern int get_vector_slice(cudamat* source, cudamat* target, unsigned int first_ind, unsigned int last_ind) {
     // source must be a vector
     if (source->size[0] > 1 && source->size[1] > 1)
         return ERROR_GENERIC;
@@ -331,7 +347,7 @@ extern int get_vector_slice(cudamat* source, cudamat* target, unsigned int first
 
 /* ------------------------------ Initialization routines ------------------------------ */
 
-extern void init_from_array(cudamat* mat, float* data, int m, int n) {
+DLLEXPORT extern void init_from_array(cudamat* mat, float* data, int m, int n) {
     mat->data_host = data;
     mat->size[0] = m;
     mat->size[1] = n;
@@ -341,7 +357,7 @@ extern void init_from_array(cudamat* mat, float* data, int m, int n) {
     mat->owns_data = 1;
 }
 
-extern int init_empty(cudamat* mat, int m, int n) {
+DLLEXPORT extern int init_empty(cudamat* mat, int m, int n) {
     mat->size[0] = m;
     mat->size[1] = n;
     mat->on_device = 0;
@@ -353,7 +369,7 @@ extern int init_empty(cudamat* mat, int m, int n) {
 }
 
 /* ------------------------------ Random number generation ------------------------------ */
-extern int fill_with_rand(rnd_struct* rnd_state, cudamat* mat) {
+DLLEXPORT extern int fill_with_rand(rnd_struct* rnd_state, cudamat* mat) {
     int len = mat->size[0] * mat->size[1];
 
     if (!mat->on_device)
@@ -370,7 +386,7 @@ extern int fill_with_rand(rnd_struct* rnd_state, cudamat* mat) {
         return 0;
 }
 
-extern int fill_with_randn(rnd_struct* rnd_state, cudamat* mat) {
+DLLEXPORT extern int fill_with_randn(rnd_struct* rnd_state, cudamat* mat) {
     int len = mat->size[0] * mat->size[1];
 
     if (!mat->on_device)
@@ -388,7 +404,7 @@ extern int fill_with_randn(rnd_struct* rnd_state, cudamat* mat) {
 }
 /* ------------------------------ Algebraic operations ------------------------------ */
 
-extern int add_col_vec(cudamat* mat, cudamat* vec, cudamat* target) {
+DLLEXPORT extern int add_col_vec(cudamat* mat, cudamat* vec, cudamat* target) {
     unsigned int h = mat->size[0],
                  w = mat->size[1];
 
@@ -414,7 +430,7 @@ extern int add_col_vec(cudamat* mat, cudamat* vec, cudamat* target) {
     return 0;
 }
 
-extern int add_col_mult(cudamat* mat, cudamat* vec, cudamat* target, float mult) {
+DLLEXPORT extern int add_col_mult(cudamat* mat, cudamat* vec, cudamat* target, float mult) {
     unsigned int h = mat->size[0],
                  w = mat->size[1];
 
@@ -439,7 +455,7 @@ extern int add_col_mult(cudamat* mat, cudamat* vec, cudamat* target, float mult)
     return 0;
 }
 
-extern int add_row_vec(cudamat* mat, cudamat* vec, cudamat* target) {
+DLLEXPORT extern int add_row_vec(cudamat* mat, cudamat* vec, cudamat* target) {
     unsigned int h = mat->size[0],
                  w = mat->size[1];
 
@@ -464,7 +480,7 @@ extern int add_row_vec(cudamat* mat, cudamat* vec, cudamat* target) {
     return 0;
 }
 
-extern int mult_by_col_vec(cudamat* mat, cudamat* vec, cudamat* target) {
+DLLEXPORT extern int mult_by_col_vec(cudamat* mat, cudamat* vec, cudamat* target) {
     unsigned int h = mat->size[0],
                  w = mat->size[1];
 
@@ -489,7 +505,7 @@ extern int mult_by_col_vec(cudamat* mat, cudamat* vec, cudamat* target) {
     return 0;
 }
 
-extern int mult_by_row_vec(cudamat* mat, cudamat* vec, cudamat* target) {
+DLLEXPORT extern int mult_by_row_vec(cudamat* mat, cudamat* vec, cudamat* target) {
     unsigned int h = mat->size[0],
                  w = mat->size[1];
 
@@ -514,7 +530,7 @@ extern int mult_by_row_vec(cudamat* mat, cudamat* vec, cudamat* target) {
     return 0;
 }
 
-extern int divide_by_col_vec(cudamat* mat, cudamat* vec, cudamat* target) {
+DLLEXPORT extern int divide_by_col_vec(cudamat* mat, cudamat* vec, cudamat* target) {
     unsigned int h = mat->size[0],
                  w = mat->size[1];
 
@@ -539,7 +555,7 @@ extern int divide_by_col_vec(cudamat* mat, cudamat* vec, cudamat* target) {
     return 0;
 }
 
-extern int divide_by_row_vec(cudamat* mat, cudamat* vec, cudamat* target) {
+DLLEXPORT extern int divide_by_row_vec(cudamat* mat, cudamat* vec, cudamat* target) {
     unsigned int h = mat->size[0],
                  w = mat->size[1];
 
@@ -564,7 +580,7 @@ extern int divide_by_row_vec(cudamat* mat, cudamat* vec, cudamat* target) {
     return 0;
 }
 
-extern int less_than(cudamat* mat1, cudamat* mat2, cudamat* target) {
+DLLEXPORT extern int less_than(cudamat* mat1, cudamat* mat2, cudamat* target) {
     int len = mat1->size[0]*mat1->size[1];
 
     if (!mat1->on_device || !mat2->on_device)
@@ -588,7 +604,7 @@ extern int less_than(cudamat* mat1, cudamat* mat2, cudamat* target) {
     return 0;
 }
 
-extern int less_than_scalar(cudamat* mat, float val, cudamat* target) {
+DLLEXPORT extern int less_than_scalar(cudamat* mat, float val, cudamat* target) {
     int len = mat->size[0]*mat->size[1];
 
     if (!mat->on_device || !target->on_device)
@@ -611,7 +627,7 @@ extern int less_than_scalar(cudamat* mat, float val, cudamat* target) {
     return 0;
 }
 
-extern int greater_than(cudamat* mat1, cudamat* mat2, cudamat* target) {
+DLLEXPORT extern int greater_than(cudamat* mat1, cudamat* mat2, cudamat* target) {
     int len = mat1->size[0]*mat1->size[1];
 
     if (!mat1->on_device || !mat2->on_device || !target->on_device)
@@ -635,7 +651,7 @@ extern int greater_than(cudamat* mat1, cudamat* mat2, cudamat* target) {
     return 0;
 }
 
-extern int greater_than_scalar(cudamat* mat, float val, cudamat* target) {
+DLLEXPORT extern int greater_than_scalar(cudamat* mat, float val, cudamat* target) {
     int len = mat->size[0]*mat->size[1];
 
     if (!mat->on_device || !target->on_device)
@@ -658,7 +674,7 @@ extern int greater_than_scalar(cudamat* mat, float val, cudamat* target) {
     return 0;
 }
 
-extern int equals(cudamat* mat1, cudamat* mat2, cudamat* target) {
+DLLEXPORT extern int equals(cudamat* mat1, cudamat* mat2, cudamat* target) {
     int len = mat1->size[0]*mat1->size[1];
 
     if (!mat1->on_device || !mat2->on_device || !target->on_device)
@@ -682,7 +698,7 @@ extern int equals(cudamat* mat1, cudamat* mat2, cudamat* target) {
     return 0;
 }
 
-extern int equals_scalar(cudamat* mat, float val, cudamat* target) {
+DLLEXPORT extern int equals_scalar(cudamat* mat, float val, cudamat* target) {
     int len = mat->size[0]*mat->size[1];
 
     if (!mat->on_device || !target->on_device)
@@ -705,7 +721,7 @@ extern int equals_scalar(cudamat* mat, float val, cudamat* target) {
     return 0;
 }
 
-extern int minimum(cudamat* mat1, cudamat* mat2, cudamat* target) {
+DLLEXPORT extern int minimum(cudamat* mat1, cudamat* mat2, cudamat* target) {
     int len = mat1->size[0]*mat1->size[1];
 
     if (!mat1->on_device || !mat2->on_device || !target->on_device)
@@ -728,7 +744,7 @@ extern int minimum(cudamat* mat1, cudamat* mat2, cudamat* target) {
     return 0;
 }
 
-extern int minimum_scalar(cudamat* mat, float val, cudamat* target) {
+DLLEXPORT extern int minimum_scalar(cudamat* mat, float val, cudamat* target) {
     int len = mat->size[0]*mat->size[1];
 
     if (!mat->on_device || !target->on_device)
@@ -750,7 +766,7 @@ extern int minimum_scalar(cudamat* mat, float val, cudamat* target) {
     return 0;
 }
 
-extern int maximum(cudamat* mat1, cudamat* mat2, cudamat* target) {
+DLLEXPORT extern int maximum(cudamat* mat1, cudamat* mat2, cudamat* target) {
     int len = mat1->size[0]*mat1->size[1];
 
     if (!mat1->on_device || !mat2->on_device || !target->on_device)
@@ -773,7 +789,7 @@ extern int maximum(cudamat* mat1, cudamat* mat2, cudamat* target) {
     return 0;
 }
 
-extern int maximum_scalar(cudamat* mat, float val, cudamat* target) {
+DLLEXPORT extern int maximum_scalar(cudamat* mat, float val, cudamat* target) {
     int len = mat->size[0]*mat->size[1];
 
     if (!mat->on_device || !target->on_device)
@@ -795,7 +811,7 @@ extern int maximum_scalar(cudamat* mat, float val, cudamat* target) {
     return 0;
 }
 
-extern int min_by_axis(cudamat* mat, cudamat* target, int axis) {
+DLLEXPORT extern int min_by_axis(cudamat* mat, cudamat* target, int axis) {
     unsigned int h = mat->size[0],
                  w = mat->size[1];
 
@@ -826,7 +842,7 @@ extern int min_by_axis(cudamat* mat, cudamat* target, int axis) {
     return 0;
 }
 
-extern int max_by_axis(cudamat* mat, cudamat* target, int axis) {
+DLLEXPORT extern int max_by_axis(cudamat* mat, cudamat* target, int axis) {
     unsigned int h = mat->size[0],
                  w = mat->size[1];
 
@@ -857,7 +873,7 @@ extern int max_by_axis(cudamat* mat, cudamat* target, int axis) {
     return 0;
 }
 
-extern int argmin_by_axis(cudamat* mat, cudamat* target, int axis) {
+DLLEXPORT extern int argmin_by_axis(cudamat* mat, cudamat* target, int axis) {
     unsigned int h = mat->size[0],
                  w = mat->size[1];
 
@@ -888,7 +904,7 @@ extern int argmin_by_axis(cudamat* mat, cudamat* target, int axis) {
     return 0;
 }
 
-extern int argmax_by_axis(cudamat* mat, cudamat* target, int axis) {
+DLLEXPORT extern int argmax_by_axis(cudamat* mat, cudamat* target, int axis) {
     unsigned int h = mat->size[0],
                  w = mat->size[1];
 
@@ -919,7 +935,7 @@ extern int argmax_by_axis(cudamat* mat, cudamat* target, int axis) {
     return 0;
 }
 
-extern int sign(cudamat* mat, cudamat* target) {
+DLLEXPORT extern int sign(cudamat* mat, cudamat* target) {
     int len = mat->size[0]*mat->size[1];
 
     if (!mat->on_device || !target->on_device)
@@ -942,7 +958,7 @@ extern int sign(cudamat* mat, cudamat* target) {
     return 0;
 }
 
-extern int apply_sigmoid(cudamat* mat, cudamat* target) {
+DLLEXPORT extern int apply_sigmoid(cudamat* mat, cudamat* target) {
     unsigned int len = mat->size[0] * mat->size[1];
 
     if (!mat->on_device || !target->on_device)
@@ -962,7 +978,7 @@ extern int apply_sigmoid(cudamat* mat, cudamat* target) {
     return 0;
 }
 
-extern int apply_tanh(cudamat* mat, cudamat* target) {
+DLLEXPORT extern int apply_tanh(cudamat* mat, cudamat* target) {
     unsigned int len = mat->size[0] * mat->size[1];
 
     if (!mat->on_device || !target->on_device)
@@ -982,7 +998,7 @@ extern int apply_tanh(cudamat* mat, cudamat* target) {
     return 0;
 }
 
-extern int apply_soft_threshold(cudamat* mat, float alpha, cudamat* target) {
+DLLEXPORT extern int apply_soft_threshold(cudamat* mat, float alpha, cudamat* target) {
     unsigned int len = mat->size[0] * mat->size[1];
 
     if (!mat->on_device || !target->on_device)
@@ -1001,7 +1017,7 @@ extern int apply_soft_threshold(cudamat* mat, float alpha, cudamat* target) {
     return 0;
 }
 
-extern int apply_abs(cudamat* mat, cudamat* target) {
+DLLEXPORT extern int apply_abs(cudamat* mat, cudamat* target) {
     unsigned int len = mat->size[0] * mat->size[1];
 
     if (!mat->on_device || !target->on_device)
@@ -1021,7 +1037,7 @@ extern int apply_abs(cudamat* mat, cudamat* target) {
     return 0;
 }
 
-extern int apply_log_1_plus_exp(cudamat* mat, cudamat* target) {
+DLLEXPORT extern int apply_log_1_plus_exp(cudamat* mat, cudamat* target) {
     unsigned int len = mat->size[0] * mat->size[1];
 
     if (!mat->on_device || !target->on_device)
@@ -1041,7 +1057,7 @@ extern int apply_log_1_plus_exp(cudamat* mat, cudamat* target) {
     return 0;
 }
 
-extern int apply_log(cudamat* mat, cudamat* target) {
+DLLEXPORT extern int apply_log(cudamat* mat, cudamat* target) {
     unsigned int len = mat->size[0] * mat->size[1];
 
     if (!mat->on_device || !target->on_device)
@@ -1061,7 +1077,7 @@ extern int apply_log(cudamat* mat, cudamat* target) {
     return 0;
 }
 
-extern int apply_exp(cudamat* mat, cudamat* target) {
+DLLEXPORT extern int apply_exp(cudamat* mat, cudamat* target) {
     unsigned int len = mat->size[0] * mat->size[1];
 
     if (!mat->on_device || !target->on_device)
@@ -1081,7 +1097,7 @@ extern int apply_exp(cudamat* mat, cudamat* target) {
     return 0;
 }
 
-extern int apply_gamma(cudamat* mat, cudamat* target) {
+DLLEXPORT extern int apply_gamma(cudamat* mat, cudamat* target) {
     unsigned int len = mat->size[0] * mat->size[1];
 
     if (!mat->on_device || !target->on_device)
@@ -1101,7 +1117,7 @@ extern int apply_gamma(cudamat* mat, cudamat* target) {
     return 0;
 }
 
-extern int apply_lgamma(cudamat* mat, cudamat* target) {
+DLLEXPORT extern int apply_lgamma(cudamat* mat, cudamat* target) {
     unsigned int len = mat->size[0] * mat->size[1];
 
     if (!mat->on_device || !target->on_device)
@@ -1121,7 +1137,7 @@ extern int apply_lgamma(cudamat* mat, cudamat* target) {
     return 0;
 }
 
-extern int apply_sqrt(cudamat* mat, cudamat* target) {
+DLLEXPORT extern int apply_sqrt(cudamat* mat, cudamat* target) {
     unsigned int len = mat->size[0] * mat->size[1];
 
     if (!mat->on_device || !target->on_device)
@@ -1141,7 +1157,7 @@ extern int apply_sqrt(cudamat* mat, cudamat* target) {
     return 0;
 }
 
-extern int apply_pow(cudamat* mat, float pow, cudamat* target) {
+DLLEXPORT extern int apply_pow(cudamat* mat, float pow, cudamat* target) {
     unsigned int len = mat->size[0] * mat->size[1];
 
     if (!mat->on_device || !target->on_device)
@@ -1161,7 +1177,7 @@ extern int apply_pow(cudamat* mat, float pow, cudamat* target) {
     return 0;
 }
 
-extern int apply_pow_matrix(cudamat* mat, cudamat* pow, cudamat* target) {
+DLLEXPORT extern int apply_pow_matrix(cudamat* mat, cudamat* pow, cudamat* target) {
     unsigned int len = mat->size[0] * mat->size[1];
 
     if (!mat->on_device || !target->on_device)
@@ -1184,7 +1200,7 @@ extern int apply_pow_matrix(cudamat* mat, cudamat* pow, cudamat* target) {
     return 0;
 }
 
-extern int reciprocal(cudamat* mat, cudamat* target) {
+DLLEXPORT extern int reciprocal(cudamat* mat, cudamat* target) {
     unsigned int len = mat->size[0] * mat->size[1];
 
     if (!mat->on_device || !target->on_device)
@@ -1204,7 +1220,7 @@ extern int reciprocal(cudamat* mat, cudamat* target) {
     return 0;
 }
 
-extern int dot(cudamat* mat1, cudamat* mat2, cudamat* target, float beta, float alpha) {
+DLLEXPORT extern int dot(cudamat* mat1, cudamat* mat2, cudamat* target, float beta, float alpha) {
     if (!mat1->on_device || !mat2->on_device || !target->on_device)
         return ERROR_NOT_ON_DEVICE;
 
@@ -1232,7 +1248,7 @@ extern int dot(cudamat* mat1, cudamat* mat2, cudamat* target, float beta, float 
     return 0;
 }
 
-extern float vdot(cudamat* mat1, cudamat* mat2, int* err_code) {
+DLLEXPORT extern float vdot(cudamat* mat1, cudamat* mat2, int* err_code) {
     int len = mat1->size[0]*mat1->size[1];
     float res;
 
@@ -1262,7 +1278,7 @@ extern float vdot(cudamat* mat1, cudamat* mat2, int* err_code) {
 
 /* Perform the operation mat1 = mat1 + alpha * mat2. mat1 and mat2 must
    have the same transposedness. */
-extern int add_mult(cudamat* mat1, cudamat* mat2, float alpha) {
+DLLEXPORT extern int add_mult(cudamat* mat1, cudamat* mat2, float alpha) {
     int len = mat1->size[0]*mat1->size[1];
 
     if (!mat1->on_device || !mat2->on_device)
@@ -1282,7 +1298,7 @@ extern int add_mult(cudamat* mat1, cudamat* mat2, float alpha) {
     return 0;
 }
 
-extern int add_elementwise(cudamat* mat1, cudamat* mat2, cudamat* target) {
+DLLEXPORT extern int add_elementwise(cudamat* mat1, cudamat* mat2, cudamat* target) {
     int len = mat1->size[0]*mat1->size[1];
 
     if (!mat1->on_device || !mat2->on_device || !target->on_device)
@@ -1314,7 +1330,7 @@ extern int add_elementwise(cudamat* mat1, cudamat* mat2, cudamat* target) {
      return 0;
 }
 
-extern int subtract_elementwise(cudamat* mat1, cudamat* mat2, cudamat* target) {
+DLLEXPORT extern int subtract_elementwise(cudamat* mat1, cudamat* mat2, cudamat* target) {
     int len = mat1->size[0]*mat1->size[1];
 
     if (!mat1->on_device || !mat2->on_device || !target->on_device)
@@ -1338,7 +1354,7 @@ extern int subtract_elementwise(cudamat* mat1, cudamat* mat2, cudamat* target) {
     return 0;
 }
 
-extern int divide_elementwise(cudamat* mat1, cudamat* mat2, cudamat* target) {
+DLLEXPORT extern int divide_elementwise(cudamat* mat1, cudamat* mat2, cudamat* target) {
     int len = mat1->size[0]*mat1->size[1];
 
     if (!mat1->on_device || !mat2->on_device || !target->on_device)
@@ -1363,7 +1379,7 @@ extern int divide_elementwise(cudamat* mat1, cudamat* mat2, cudamat* target) {
 }
 
 /* Elementwise multiplication of 2 matrices */
-extern int mult_elementwise(cudamat* mat1, cudamat* mat2, cudamat* target) {
+DLLEXPORT extern int mult_elementwise(cudamat* mat1, cudamat* mat2, cudamat* target) {
     int len = mat1->size[0]*mat1->size[1];
 
     if (!mat1->on_device || !mat2->on_device || !target->on_device)
@@ -1387,7 +1403,7 @@ extern int mult_elementwise(cudamat* mat1, cudamat* mat2, cudamat* target) {
     return 0;
 }
 
-extern int assign_scalar(cudamat* mat, float alpha) {
+DLLEXPORT extern int assign_scalar(cudamat* mat, float alpha) {
     int len = mat->size[0]*mat->size[1];
 
     if (!mat->on_device)
@@ -1404,7 +1420,7 @@ extern int assign_scalar(cudamat* mat, float alpha) {
     return 0;
 }
 
-extern int mult_by_scalar(cudamat* mat, float alpha, cudamat* target) {
+DLLEXPORT extern int mult_by_scalar(cudamat* mat, float alpha, cudamat* target) {
     int len = mat->size[0]*mat->size[1];
 
     if (!mat->on_device || !target->on_device)
@@ -1432,7 +1448,7 @@ extern int mult_by_scalar(cudamat* mat, float alpha, cudamat* target) {
     return 0;
 }
 
-extern int divide_by_scalar(cudamat* mat, float alpha, cudamat* target) {
+DLLEXPORT extern int divide_by_scalar(cudamat* mat, float alpha, cudamat* target) {
     int len = mat->size[0]*mat->size[1];
 
     if (!mat->on_device || !target->on_device)
@@ -1452,7 +1468,7 @@ extern int divide_by_scalar(cudamat* mat, float alpha, cudamat* target) {
     return 0;
 }
 
-extern int add_scalar(cudamat* mat, float alpha, cudamat* target) {
+DLLEXPORT extern int add_scalar(cudamat* mat, float alpha, cudamat* target) {
     int len = mat->size[0]*mat->size[1];
 
     if (!mat->on_device || !target->on_device)
@@ -1472,7 +1488,7 @@ extern int add_scalar(cudamat* mat, float alpha, cudamat* target) {
     return 0;
 }
 
-extern float euclid_norm(cudamat* mat, int* err_code) {
+DLLEXPORT extern float euclid_norm(cudamat* mat, int* err_code) {
     int len = mat->size[0]*mat->size[1];
 
     if (!mat->on_device) {
@@ -1491,7 +1507,7 @@ extern float euclid_norm(cudamat* mat, int* err_code) {
     }
 }
 
-extern float manhattan_norm(cudamat* mat, int* err_code) {
+DLLEXPORT extern float manhattan_norm(cudamat* mat, int* err_code) {
     int len = mat->size[0]*mat->size[1];
 
     if (!mat->on_device) {
@@ -1510,7 +1526,7 @@ extern float manhattan_norm(cudamat* mat, int* err_code) {
     }
 }
 
-extern int selectRows(cudamat* source, cudamat* target, cudamat* indices){
+DLLEXPORT extern int selectRows(cudamat* source, cudamat* target, cudamat* indices){
     const int nRetRows = indices->size[1];
 
     if (nRetRows==0) return 0;
@@ -1529,7 +1545,7 @@ extern int selectRows(cudamat* source, cudamat* target, cudamat* indices){
         return 0;
 }
 
-extern int setSelectedRows(cudamat* target, cudamat* source, cudamat* indices){
+DLLEXPORT extern int setSelectedRows(cudamat* target, cudamat* source, cudamat* indices){
     const int nSetRows = indices->size[1];
 
     if (nSetRows==0)
@@ -1549,7 +1565,7 @@ extern int setSelectedRows(cudamat* target, cudamat* source, cudamat* indices){
         return 0;
 }
 
-extern int where(cudamat* condition_mat, cudamat* if_mat, cudamat* else_mat, cudamat* target) {
+DLLEXPORT extern int where(cudamat* condition_mat, cudamat* if_mat, cudamat* else_mat, cudamat* target) {
     unsigned int len = condition_mat->size[0] * condition_mat->size[1];
 
     if (!condition_mat->on_device || !target->on_device)

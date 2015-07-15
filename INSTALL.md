@@ -39,6 +39,24 @@ To compile for both Compute Capability 2.0 and 3.5, you would run:
 NVCCFLAGS="-gencode arch=compute_20,code=sm_20 -gencode arch=compute_35,code=sm_35" ...
 ```
 
+Installation for Windows
+------------------------
+
+1. Install a Python distribution (tested with Anaconda)
+
+2. Install Windows SDK 7.0.
+
+3. Open a Visual Studio 2008 x64 Win64 Command Prompt.
+
+4. Install the CUDA SDK. (tested with version 5.5)
+
+4a. Apply the workaround for a CUDA compilter bug:
+	Copy "C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\bin\vcvars64.bat" to
+	"C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\bin\amd64\vcvarsamd64.bat"
+
+5. Run pip install --user -e .
+
+
 Testing
 -------
 

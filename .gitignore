@@ -36,3 +36,11 @@ nosetests.xml
 
 # Vim
 *.swp
+
+*.pyc
+*.dll
+*.exp
+*.lib
+*.so
+cudamat.egg-info
+

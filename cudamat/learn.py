@@ -8,6 +8,7 @@ import numpy as np
 from cudamat import generate_exception
 
 if platform.system() == 'Windows':
+    os.environ['PATH'] += ";" + os.path.dirname(__file__)
     _cudalearn = ct.cdll.LoadLibrary('libcudalearn.dll')
 else:
     _cudalearn = ct.cdll.LoadLibrary(os.path.join(os.path.dirname(__file__) or os.path.curdir,
